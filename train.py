@@ -97,6 +97,7 @@ def build_arima_and_predict(df, order=(2, 0, 1)):
     df_pred = pd.DataFrame(predictions).set_index("date")
     return df_pred
 
+
 def build_arima_and_predict_gridsearch(df):
     p_range = [0, 1, 2]
     d_range = [0, 1]
@@ -116,9 +117,6 @@ def build_arima_and_predict_gridsearch(df):
                         best_order = (p, d, q)
                 except:
                     pass
-    if best_order is None:
-        print("Best order is None")
-        best_order = (2, 0, 1)
 
     df_best = build_arima_and_predict(df, order=best_order)
     return df_best, best_order, best_rmse
@@ -207,16 +205,16 @@ def show_plot(df_predictions, original_df):
 
 power_df = pd.read_csv(PATH, parse_dates=["date"], index_col="date")
 power_df.index.freq = "D"
-print(power_df)
+# print(power_df)
 
-model = "OLS"
-df_predictions = build_ols_and_predict(power_df)
+# model = "OLS"
+# df_predictions = build_ols_and_predict(power_df)
 
 # model = "Holt-Winters
 # df_predictions = build_holt_winters_and_predict(power_df)
 
-# model = "ARIMA"
-# df_predictions = build_arima_and_predict(power_df, order=(1, 1, 0))
+model = "ARIMA"
+df_predictions = build_arima_and_predict(power_df, order=(1, 1, 0))
 
 # model = "ARIMA GridSearch"
 # df_predictions, best_order, best_rmse = build_arima_and_predict_gridsearch(power_df)
