@@ -7,13 +7,15 @@ import statsmodels.tsa.arima.model as sma
 from sklearn.preprocessing import StandardScaler
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from sklearn.linear_model import Ridge
-
+from statsmodels.tsa.seasonal import seasonal_decompose
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+import seaborn as sns
 
 pd.set_option("display.max_columns", None)
 pd.set_option("display.width", 1000)
 
 DIRECTORY = "/Users/momonawada/PycharmProjects/comp4949-assignment1/"
-FILE_NAME = "foreign_solar_power_generation.csv"
+FILE_NAME = "dec14-19_foreign_solar_power_generation.csv"
 PATH = DIRECTORY + FILE_NAME
 TEST_SIZE = 6
 
@@ -192,26 +194,59 @@ def get_x_and_y_values(df):
         X = X[preferred_order]
     return X, y
 
-def show_plot(df_predictions, original_df):
-    dates = df_predictions.index
-    plt.plot(dates, df_predictions["Prediction"], marker="o", label="Prediction", color="orange")
-    plt.plot(dates, df_predictions["Actual"], marker="o", label="Actual", color="blue")
-    plt.xticks(rotation=70)
-    plt.title(f"{model} Forecast (last {TEST_SIZE} days)")
-    plt.legend()
-    plt.tight_layout()
+def plot_histogram():
+    plt.hist(power_df["Power"], bins=30)
+    plt.title("Distribution of Power")
+    plt.xlabel("Power")
+    plt.ylabel("Frequency")
+    plt.show()
+
+def plot_scatter_map():
+    plt.scatter(power_df["power_t-1"], power_df["Power"], alpha=0.5)
+    plt.title("Power vs. Power_t-1")
+    plt.xlabel("power_t-1")
+    plt.ylabel("Power")
+    plt.show()
+
+def plot_heatmap(df, target):
+    # corr = df[columns + [target]].corr()
+    corr = df.corr()
+    corr = corr.sort_values(by=target, ascending=False)
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(corr[[target]], annot=True, cmap="coolwarm")
+    plt.title("Heatmap")
     plt.show()
 
 
 power_df = pd.read_csv(PATH, parse_dates=["date"], index_col="date")
 power_df.index.freq = "D"
+
+power_df = implement_back_shifting(power_df)
 # print(power_df)
+
+# tseries = seasonal_decompose(power_df["Power"], model="multiplicative", extrapolate_trend="freq", period=365)
+# tseries.plot()
+# plt.show()
+
+# plot_histogram()
+
+# plot_acf(power_df["Power"], lags=50)
+# plt.title("ACF of Power")
+# plt.show()
+#
+# plot_pacf(power_df["Power"], lags=50)
+# plt.title("PACF of Power")
+# plt.show()
+
+# plot_scatter_map()
+
+plot_heatmap(power_df, "Power")
 
 # model = "OLS"
 # df_predictions = build_ols_and_predict(power_df)
 
-model = "Holt-Winters"
-df_predictions = build_holt_winters_and_predict(power_df)
+# model = "Holt-Winters
+# df_predictions = build_holt_winters_and_predict(power_df)
 
 # model = "ARIMA"
 # df_predictions = build_arima_and_predict(power_df, order=(1, 1, 0))
@@ -223,14 +258,12 @@ df_predictions = build_holt_winters_and_predict(power_df)
 # model = "Ridge"
 # df_predictions = build_ridge_and_predict(power_df)
 
-print(df_predictions)
+# print(df_predictions)
 
-
-rmse = np.sqrt(mean_squared_error(df_predictions["Prediction"], df_predictions["Actual"]))
-print(f"RMSE: {rmse}")
+# rmse = np.sqrt(mean_squared_error(df_predictions["Prediction"], df_predictions["Actual"]))
+# print(f"RMSE: {rmse}")
 # print(f"RMSE: (Grid search Final): {rmse}")
 
-show_plot(df_predictions, power_df)
 
 
 def main():
