@@ -224,9 +224,11 @@ power_df.index.freq = "D"
 power_df = implement_back_shifting(power_df)
 # print(power_df)
 
-# tseries = seasonal_decompose(power_df["Power"], model="multiplicative", extrapolate_trend="freq", period=365)
-# tseries.plot()
-# plt.show()
+tseries = seasonal_decompose(power_df["Power"], model="multiplicative", extrapolate_trend="freq", period=365)
+tseries.plot()
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
 
 # plot_histogram()
 
@@ -240,7 +242,7 @@ power_df = implement_back_shifting(power_df)
 
 # plot_scatter_map()
 
-plot_heatmap(power_df, "Power")
+# plot_heatmap(power_df, "Power")
 
 # model = "OLS"
 # df_predictions = build_ols_and_predict(power_df)

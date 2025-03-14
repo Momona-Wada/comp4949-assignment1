@@ -45,6 +45,7 @@ def build_ols_and_predict(df):
             "date": test.index[0],
             "Prediction": pred_t,
             "Actual": actual_t}, ignore_index=True)
+
     df_predictions = pd.DataFrame(df_predictions).set_index("date")
     return df_predictions
 
@@ -190,9 +191,11 @@ def get_x_and_y_values(df):
         X["const"] = 1
         preferred_order = ["const"] + feature_cols
         X = X[preferred_order]
+
+    print(X.columns)
     return X, y
 
-def show_plot(df_predictions, original_df):
+def show_plot(df_predictions):
     dates = df_predictions.index
     plt.plot(dates, df_predictions["Prediction"], marker="o", label="Prediction", color="orange")
     plt.plot(dates, df_predictions["Actual"], marker="o", label="Actual", color="blue")
@@ -216,25 +219,12 @@ df_predictions = build_holt_winters_and_predict(power_df)
 # model = "ARIMA"
 # df_predictions = build_arima_and_predict(power_df, order=(1, 1, 0))
 
-# model = "ARIMA GridSearch"
-# df_predictions, best_order, best_rmse = build_arima_and_predict_gridsearch(power_df)
-# print(f"Best ARIMA order: {best_order}, RMSE: {best_rmse}")
-
 # model = "Ridge"
 # df_predictions = build_ridge_and_predict(power_df)
 
 print(df_predictions)
 
-
 rmse = np.sqrt(mean_squared_error(df_predictions["Prediction"], df_predictions["Actual"]))
 print(f"RMSE: {rmse}")
-# print(f"RMSE: (Grid search Final): {rmse}")
 
-show_plot(df_predictions, power_df)
-
-
-def main():
-    pass
-
-if __name__ == '__main__':
-    main()
+show_plot(df_predictions)
